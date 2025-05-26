@@ -1,33 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { TextField, Button, Box } from "@mui/material";
 import { SocketMessageTypes, TelepartyClient } from "teleparty-websocket-lib";
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
-  isTyping: boolean;
-  setIsTyping: (typing: boolean) => void;
   client: TelepartyClient | null;
+  currentUser: string;
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({
   onSendMessage,
-  isTyping,
-  setIsTyping,
   client,
+  currentUser,
 }) => {
   const [message, setMessage] = useState("");
+  const typingTimeout = useRef<NodeJS.Timeout>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim() || !client) return;
-    onSendMessage(message);
-    setMessage("");
-    if (isTyping) {
-      setIsTyping(false);
-      client.sendMessage(SocketMessageTypes.SET_TYPING_PRESENCE, {
-        typing: false,
-      });
-    }
+  const sendTypingStatus = (isTyping: boolean) => {
+    if (!client) return;
+    client.sendMessage(SocketMessageTypes.SET_TYPING_PRESENCE, {
+      typing: isTyping,
+      nickname: currentUser,
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,18 +29,38 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
     if (!client) return;
 
-    if (e.target.value && !isTyping) {
-      setIsTyping(true);
-      client.sendMessage(SocketMessageTypes.SET_TYPING_PRESENCE, {
-        typing: true,
-      });
-    } else if (!e.target.value && isTyping) {
-      setIsTyping(false);
-      client.sendMessage(SocketMessageTypes.SET_TYPING_PRESENCE, {
-        typing: false,
-      });
+    // Clear any existing timeout
+    if (typingTimeout.current) {
+      clearTimeout(typingTimeout.current);
+    }
+
+    if (e.target.value) {
+      sendTypingStatus(true);
+
+      typingTimeout.current = setTimeout(() => {
+        sendTypingStatus(false);
+      }, 3000);
+    } else {
+      sendTypingStatus(false);
     }
   };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim() || !client) return;
+    onSendMessage(message);
+    setMessage("");
+    sendTypingStatus(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeout.current) {
+        clearTimeout(typingTimeout.current);
+      }
+      sendTypingStatus(false);
+    };
+  }, []);
 
   return (
     <Box component="form" onSubmit={handleSubmit}>

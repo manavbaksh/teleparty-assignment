@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { Button, Box, Typography, Paper, Avatar } from "@mui/material";
+import React from "react";
+import { Box, Typography, Paper, Avatar, IconButton } from "@mui/material";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import { TelepartyClient, SocketMessageTypes } from "teleparty-websocket-lib";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 interface ChatRoomProps {
   user: {
@@ -13,6 +14,7 @@ interface ChatRoomProps {
   client: TelepartyClient | null;
   messages: any[];
   onLogout: () => void;
+  usersTyping: string[];
 }
 
 const ChatRoom: React.FC<ChatRoomProps> = ({
@@ -20,9 +22,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   client,
   messages,
   onLogout,
+  usersTyping,
 }) => {
-  const [isTyping, setIsTyping] = useState(false);
-
   const handleSendMessage = (message: string) => {
     if (!message.trim() || !client) return;
     client.sendMessage(SocketMessageTypes.SEND_MESSAGE, {
@@ -44,18 +45,23 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
           )}
           <Typography variant="h5">Room: {user.roomId}</Typography>
         </Box>
-        <Button variant="outlined" onClick={onLogout}>
-          Leave Room
-        </Button>
+        <IconButton onClick={onLogout} color="error" title="Leave Room">
+          <ExitToAppIcon />
+        </IconButton>
       </Box>
 
       <MessageList messages={messages} currentUser={user.nickname} />
+      {usersTyping.length > 0 && (
+        <div className="typing-indicator">
+          {usersTyping.join(", ")} {usersTyping.length > 1 ? "are" : "is"}{" "}
+          typing...
+        </div>
+      )}
 
       <MessageInput
         onSendMessage={handleSendMessage}
-        isTyping={isTyping}
-        setIsTyping={setIsTyping}
         client={client}
+        currentUser={user.nickname} // Pass this if needed
       />
     </Paper>
   );
