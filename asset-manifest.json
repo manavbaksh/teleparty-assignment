@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/teleparty-assignment/static/css/main.b527d666.css",
-    "main.js": "/teleparty-assignment/static/js/main.7e7fb706.js",
+    "main.css": "/teleparty-assignment/static/css/main.86103284.css",
+    "main.js": "/teleparty-assignment/static/js/main.b0c0de1e.js",
     "static/js/453.b1662459.chunk.js": "/teleparty-assignment/static/js/453.b1662459.chunk.js",
     "index.html": "/teleparty-assignment/index.html",
-    "main.b527d666.css.map": "/teleparty-assignment/static/css/main.b527d666.css.map",
-    "main.7e7fb706.js.map": "/teleparty-assignment/static/js/main.7e7fb706.js.map",
+    "main.86103284.css.map": "/teleparty-assignment/static/css/main.86103284.css.map",
+    "main.b0c0de1e.js.map": "/teleparty-assignment/static/js/main.b0c0de1e.js.map",
     "453.b1662459.chunk.js.map": "/teleparty-assignment/static/js/453.b1662459.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b527d666.css",
-    "static/js/main.7e7fb706.js"
+    "static/css/main.86103284.css",
+    "static/js/main.b0c0de1e.js"
   ]
 }
